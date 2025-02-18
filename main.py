@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 
 
-
+Base = declarative_base()
 
 
 def connect_db():
@@ -32,17 +32,28 @@ def connect_db():
 def create_new_db():
     for widget in frame.winfo_children():
         widget.destroy()
-        tk.Label(frame, text="Enter database name to create: ").grid(row=0,column=0,padx=5)
-        db_name_enter = tk.Entry(frame).grid(row=0,column=1,padx=5,columnspan=2)
-        tk.Button(frame,text='Go back:',command=main_window).grid(row=1,column=0,pady=5)
+
+    tk.Label(frame, text="Enter database name to create: ",bg='#333',fg='white').grid(row=0,column=0,padx=5)
+    db_name_enter = tk.Entry(frame)
+    db_name_enter.grid(row=1,column=0,padx=5,columnspan=3)
+    tk.Button(frame,text='Go back:',command=main_window).grid(row=2,column=0,pady=5)
+
+
+
+    def create_db():
+        db_name = str(db_name_enter.get())
+        if db_name:
+            engine = create_engine(f'sqlite:///{db_name}.db')
+            Base.metadata.create_all(engine)
+            tk.Label(frame, text=f"Database '{db_name}' created successfully!", bg='#333', fg='white').grid(row=3, column=0, pady=5)
+        else:
+            tk.Label(frame, text="Database name cannot be empty", bg='#333', fg='red').grid(row=3, column=0, pady=5)
+
+    tk.Button(frame, text='Create',command=create_db).grid(row=1, column=1, pady=5, padx=5)
 
 
 
 
-engine = create_engine('sqlite:///local_database.db')
-Session = sessionmaker(bind=engine)
-session = Session()
-metadata = MetaData()
 
 window = tk.Tk()
 window.title("SQL Managment App")
